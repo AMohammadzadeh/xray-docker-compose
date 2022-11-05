@@ -1,0 +1,91 @@
+{
+    "log": {
+        "access": "/var/log/xray/access.log",
+        "error": "/var/log/xray/error.log",
+        "loglevel": "warning"
+      },
+      "inbounds": [
+        {
+            "port": 443,
+            "protocol": "vless",
+            "settings": {
+                "clients": [
+                    {
+                        "id": "<BRIDGE-UUID>",
+                        "level": 0
+                    }
+                ],
+                "decryption": "none",
+                "fallbacks": [
+                    {
+                        "dest": 80
+                    }
+                ]
+            },
+            "streamSettings": {
+                "network": "tcp",
+                "security": "tls",
+                "tlsSettings": {
+                    "alpn": [
+                        "http/1.1"
+                    ],
+                    "certificates": [
+                        {
+                          "certificateFile" : "<CERTIFICATE-ABSOLUTE-PATH>" ,
+                          "keyFile" : "<KEY-ABSOLUTE-PATH>" 
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "outbounds": [
+      {
+        "protocol": "vless",
+            "settings": {
+                "vnext": [
+                    {
+                        "address": "<UPSTREAM-DOMIAN>",
+                        "port": 443,
+                        "users": [
+                            {
+                                "id": "<UPSTREAM-UUID>",
+                                "encryption": "none",
+                                "level": 0
+                            }
+                        ]
+                    }
+                ]
+            },
+            "streamSettings": {
+                "network": "tcp",
+                "security": "tls"
+            }
+        },
+    {
+      "protocol": "freedom",
+      "tag": "freedom"
+    }
+    ],
+    "dns": {
+        "servers": [
+          "8.8.8.8",
+          "8.8.4.4",
+          "localhost"
+        ]
+      },
+      "routing": {
+        "domainStrategy": "IPIfNonMatch",
+        "settings": {
+          "rules": [
+            {
+              "type": "field",
+              "outboundTag": "freedom",
+              "domain": [
+                "regexp:.*\\.ir$"
+              ]
+            }
+          ]
+        }
+      }
+  }

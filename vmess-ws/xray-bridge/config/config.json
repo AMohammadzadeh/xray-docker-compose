@@ -1,0 +1,95 @@
+{
+    "log": {
+        "access": "/var/log/xray/access.log",
+        "error": "/var/log/xray/error.log",
+        "loglevel": "warning"
+      },
+    "inbounds": [
+        {
+            "listen": "127.0.0.1",
+            "port": "1080",
+            "protocol": "socks",
+            "settings": {
+                "auth": "noauth",
+                "udp": true,
+                "ip": "127.0.0.1"
+            }
+        },
+        {
+            "listen": "127.0.0.1",
+            "port": "1081",
+            "protocol": "http"
+        },
+        {
+            "listen": "0.0.0.0",
+            "port": 1210,
+            "protocol": "shadowsocks",
+            "settings": {
+              "password": "<SHADOWSOCS-PASSWORD>",
+              "method": "aes-256-gcm",
+              "level": 0,
+              "network": "tcp,udp"
+            }
+          },
+      {
+        "port": 1310,
+        "protocol": "vmess",
+        "settings": {
+          "clients": [
+            {
+              "id": "<BRIDGE-UUID>",
+              "level": 0,
+              "alterId": 0
+            }
+          ]
+        }
+      }
+    ],
+    "outbounds": [
+      {
+        "protocol": "freedom"
+      },
+      {
+        "protocol": "vmess",
+        "settings": {
+          "vnext": [
+            {
+              "address": "<UPSTREAM-IP>",
+              "port": 1310,
+              "users": [
+                {
+                  "id": "<UPSTREAM-UUID>",
+                  "alterId": 0,
+                  "security": "none"
+                }
+              ]
+            }
+          ]
+        },
+        "streamSettings": {
+          "network": "ws"
+        }
+      }
+    ],
+    "dns": {
+        "servers": [
+          "8.8.8.8",
+          "8.8.4.4",
+          "localhost"
+        ]
+      },
+      "routing": {
+        "domainStrategy": "IPIfNonMatch",
+        "settings": {
+          "rules": [
+            {
+              "type": "field",
+              "outboundTag": "freedom",
+              "domain": [
+                "regexp:.*\\.ir$"
+              ]
+            }
+          ]
+        }
+      }
+  }

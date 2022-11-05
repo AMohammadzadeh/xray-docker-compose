@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  v2ray:
+    image: teddysun/xray
+    restart: always
+    environment:
+      - xray.vmess.aead.forced=false
+    ports:
+      - "127.0.0.1:1080:1080"
+      - "127.0.0.1:1080:1080/udp"
+      - "127.0.0.1:1081:1081"
+      - "1210:1210"
+      - "1210:1210/udp"
+      - "1310:1310"
+    volumes:
+      - ./config/:/etc/xray/
+      - ./logs:/var/log/xray/
