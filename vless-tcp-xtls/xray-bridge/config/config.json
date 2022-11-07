@@ -1,0 +1,95 @@
+{
+    "log": {
+        "access": "/var/log/xray/access.log",
+        "error": "/var/log/xray/error.log",
+        "loglevel": "warning"
+      },
+      "inbounds": [
+        {
+            "port": 443,
+            "protocol": "vless",
+            "settings": {
+                "clients": [
+                    {
+                        "id": "<BRIDGE-UUID>",
+                        "flow": "xtls-rprx-direct",
+                        "level": 0
+                    }
+                ],
+                "decryption": "none",
+                "fallbacks": [
+                    {
+                        "dest": 80
+                    }
+                ]
+            },
+            "streamSettings": {
+                "network": "tcp",
+                "security": "xtls",
+                "xtlsSettings": {
+                    "alpn": [
+                        "http/1.1"
+                    ],
+                    "certificates": [
+                        {
+                          "certificateFile" : "<CERTIFICATE-ABSOLUTE-PATH>" ,
+                          "keyFile" : "<KEY-ABSOLUTE-PATH>" 
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "outbounds": [
+      {
+        "protocol": "vless",
+            "settings": {
+                "vnext": [
+                    {
+                        "address": "<UPSTREAM-DOMAIN>",
+                        "port": 443,
+                        "users": [
+                            {
+                                "id": "<UPSTREAM-UUID>",
+                                 "flow": "xtls-rprx-direct",
+                                "encryption": "none",
+                                "level": 0
+                            }
+                        ]
+                    }
+                ]
+            },
+            "streamSettings": {
+                "network": "tcp",
+                "security": "xtls",
+                "xtlsSettings": {
+                    "serverName": "<UPSTREAM-DOMAIN>"
+                }
+        },
+    {
+      "protocol": "freedom",
+      "tag": "freedom"
+    }
+    ],
+    "dns": {
+        "servers": [
+          "8.8.8.8",
+          "8.8.4.4",
+          "localhost"
+        ]
+      },
+      "routing": {
+        "domainStrategy": "IPIfNonMatch",
+        "settings": {
+          "rules": [
+            {
+              "type": "field",
+              "outboundTag": "freedom",
+              "domain": [
+                "regexp:.*\\.ir$"
+              ]
+            }
+          ]
+        }
+      }
+  }
